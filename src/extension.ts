@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 
+import { Chronos } from './chronos';
 import { Command, LogLevel } from './constants';
 import { Logger } from './logger';
-import { Chronos } from './chronos';
 
 const logger = new Logger(LogLevel.INFO);
 let chronos: Chronos;
@@ -18,9 +18,15 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
+    vscode.commands.registerCommand(Command.TEST, () => {
+      chronos.test();
+    })
+  );
+
+  context.subscriptions.push(
     vscode.commands.registerCommand(Command.SET_API_KEY, () => {
       chronos.promptForApiKey();
-    }),
+    })
   );
 
   context.subscriptions.push(chronos);

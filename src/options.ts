@@ -1,12 +1,13 @@
 import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
+
 import * as vscode from 'vscode';
 
+import { DEFAULT_SERVER_URL } from './constants';
 import { Desktop } from './desktop';
 import { Logger } from './logger';
 import { Utils } from './utils';
-import { DEFAULT_SERVER_URL } from './constants';
 
 export class Options {
   private configFile: string;
@@ -34,7 +35,7 @@ export class Options {
     section: string,
     key: string,
     internal: boolean,
-    callback: (Setting) => void,
+    callback: (Setting) => void
   ): void {
     fs.readFile(
       this.getConfigFile(internal),
@@ -68,7 +69,7 @@ export class Options {
 
           callback({ key, value: null });
         }
-      },
+      }
     );
   }
 
@@ -89,7 +90,7 @@ export class Options {
     if (!Utils.apiKeyInvalid(keyFromEnv)) {
       if (this.cache.api_key && this.cache.api_key !== keyFromEnv) {
         vscode.window.showErrorMessage(
-          `Chronos API Key conflict. Your env key doesn't match your ${from} key.`,
+          `Chronos API Key conflict. Your env key doesn't match your ${from} key.`
         );
         return this.cache.api_key;
       }
@@ -102,7 +103,7 @@ export class Options {
       if (!Utils.apiKeyInvalid(apiKeyFromVault)) {
         if (this.cache.api_key && this.cache.api_key !== apiKeyFromVault) {
           vscode.window.showErrorMessage(
-            `Chronos API Key conflict. Your vault command key doesn't match your ${from} key.`,
+            `Chronos API Key conflict. Your vault command key doesn't match your ${from} key.`
           );
           return this.cache.api_key;
         }
@@ -118,7 +119,7 @@ export class Options {
       if (!Utils.apiKeyInvalid(apiKey)) {
         if (this.cache.api_key && this.cache.api_key !== apiKey) {
           vscode.window.showErrorMessage(
-            `Chronos API Key conflict. Your ~/.chronos.cfg key doesn't match your ${from} key.`,
+            `Chronos API Key conflict. Your ~/.chronos.cfg key doesn't match your ${from} key.`
           );
         }
         this.cache.api_key = apiKey;
@@ -127,7 +128,7 @@ export class Options {
       this.logger.debug(`Exception while reading API Key from config file: ${err}`);
       if (!this.cache.api_key && `${err}`.includes('spawn EPERM')) {
         vscode.window.showErrorMessage(
-          'Microsoft Defender is blocking Chronos. Please allow Chronos to run so it can upload code stats to your dashboard.',
+          'Microsoft Defender is blocking Chronos. Please allow Chronos to run so it can upload code stats to your dashboard.'
         );
       }
     }

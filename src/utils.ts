@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+
 import { TIME_BETWEEN_HEARTBEATS } from './constants';
 
 export class Utils {
@@ -33,8 +34,7 @@ export class Utils {
     if (workspaceFolder) {
       try {
         return workspaceFolder.name;
-      } catch (e) {
-      }
+      } catch (e) {}
     }
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
       return vscode.workspace.workspaceFolders[0].name;
@@ -48,7 +48,7 @@ export class Utils {
     if (workspaceFolder) {
       try {
         return workspaceFolder.uri.fsPath;
-      } catch (e) { }
+      } catch (e) {}
     }
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
       return vscode.workspace.workspaceFolders[0].uri.fsPath;

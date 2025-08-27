@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+
 import { LogLevel } from './constants';
 
 export class Logger {
@@ -18,10 +20,10 @@ export class Logger {
   public log(level: LogLevel, msg: string): void {
     if (level >= this.level) {
       msg = `[Chronos][${LogLevel[level]}] ${msg}`;
-      if (level == LogLevel.DEBUG) console.log(msg);
-      if (level == LogLevel.INFO) console.info(msg);
-      if (level == LogLevel.WARN) console.warn(msg);
-      if (level == LogLevel.ERROR) console.error(msg);
+      if (level === LogLevel.DEBUG) console.log(msg);
+      if (level === LogLevel.INFO) console.info(msg);
+      if (level === LogLevel.WARN) console.warn(msg);
+      if (level === LogLevel.ERROR) console.error(msg);
     }
   }
 

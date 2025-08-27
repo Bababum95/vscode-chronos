@@ -1,5 +1,6 @@
-import axios from "axios";
-import type { Heartbeat } from "./types";
+import axios from 'axios';
+
+import type { Heartbeat } from './types';
 
 export class Api {
   private apiKey: string | null = null;
@@ -28,8 +29,8 @@ export class Api {
       { heartbeats },
       {
         headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Basic ${Buffer.from(`${this.apiKey}:`).toString("base64")}`,
+          'Content-Type': 'application/json',
+          Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
         },
       }
     );
@@ -38,14 +39,11 @@ export class Api {
   /** Fetch coding activity summary */
   async getToday(): Promise<any> {
     const today = new Date().toISOString().slice(0, 10);
-    const res = await axios.get(
-      `${this.apiUrl}/summaries?start=${today}&end=${today}`,
-      {
-        headers: {
-          "Authorization": `Basic ${Buffer.from(`${this.apiKey}:`).toString("base64")}`,
-        },
-      }
-    );
+    const res = await axios.get(`${this.apiUrl}/summaries?start=${today}&end=${today}`, {
+      headers: {
+        Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
+      },
+    });
     return res.data;
   }
 }

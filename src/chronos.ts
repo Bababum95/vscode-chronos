@@ -1,16 +1,25 @@
-import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { AI_RECENT_PASTES_TIME, SEND_BUFFER } from './constants';
-import { Logger } from './logger';
-import { Utils } from './utils';
-import { Options } from './options';
-import { Desktop } from './desktop';
-import type { Lines, LineCounts, FileSelectionMap, Heartbeat } from './types';
+import * as vscode from 'vscode';
+
 import { Api } from './api';
+import { AI_RECENT_PASTES_TIME, Command, SEND_BUFFER } from './constants';
+import { Desktop } from './desktop';
+import { Logger } from './logger';
+import { Options } from './options';
+import { Utils } from './utils';
+
+import type {
+  FileSelectionMap,
+  Heartbeat,
+  LineCounts,
+  Lines,
+  Setting,
+} from './types';
 
 export class Chronos {
+  private extension: any;
   private disposable: vscode.Disposable;
   private statusBar?: vscode.StatusBarItem = undefined;
 
@@ -43,8 +52,8 @@ export class Chronos {
   private lastCompile: boolean = false;
   private isDebugging: boolean = false;
   private isCompiling: boolean = false;
-  private showStatusBar: boolean;
-  private showCodingActivity: boolean;
+  private showStatusBar: boolean = true;
+  private showCodingActivity: boolean = true;
 
   constructor(extensionPath: string, logger: Logger) {
     this.extensionPath = extensionPath;
@@ -54,11 +63,44 @@ export class Chronos {
   }
 
   public async initialize() {
-    this.setEventListeners();
+    const extension = vscode.extensions.getExtension('Chronos.vscode-chronos');
+    this.extension = (extension !== undefined && extension.packageJSON) || { version: '0.0.0' };
+    this.logger.debug(`Initializing Chronos v${this.extension.version}`);
 
     this.api = new Api(await this.options.getServerUrl());
     const apiKey = await this.options.getApiKey();
     if (apiKey) this.api.setApiKey(apiKey);
+
+    this.statusBar = vscode.window.createStatusBarItem(
+      'com.chronos.statusbar',
+      vscode.StatusBarAlignment.Left,
+      3,
+    );
+    this.statusBar.name = 'Chronos';
+    this.statusBar.command = Command.DASHBOARD;
+
+    this.options.getSetting(
+      'settings',
+      'status_bar_enabled',
+      false,
+      (statusBarEnabled: Setting) => {
+        this.showStatusBar = statusBarEnabled.value !== 'false';
+        this.setStatusBarVisibility(this.showStatusBar);
+        this.updateStatusBarText('Chronos Initializing...');
+
+        this.options.getSetting(
+          'settings',
+          'status_bar_coding_activity',
+          false,
+          (showCodingActivity: Setting) => {
+            this.showCodingActivity = showCodingActivity.value !== 'false';
+            this.getCodingActivity();
+          },
+        );
+      },
+    );
+
+    this.setEventListeners();
   }
 
   public dispose() {
@@ -67,7 +109,7 @@ export class Chronos {
 
   private setResourcesLocation() {
     const home = Desktop.getHomeDirectory();
-    const folder = path.join(home, '.wakatime');
+    const folder = path.join(home, '.chronos');
 
     try {
       fs.mkdirSync(folder, { recursive: true });
@@ -110,7 +152,7 @@ export class Chronos {
               isWrite,
               this.isCompiling,
               this.isDebugging,
-              this.isAICodeGenerating,
+              this.isAICodeGenerating
             );
             this.lastFile = file;
             this.lastHeartbeat = time;
@@ -130,7 +172,7 @@ export class Chronos {
     isWrite: boolean,
     isCompiling: boolean,
     isDebugging: boolean,
-    isAICoding: boolean,
+    isAICoding: boolean
   ): Promise<void> {
     const file = Utils.getFocusedFile(doc);
     if (!file) return;
@@ -192,9 +234,7 @@ export class Chronos {
     const prev = this.linesInFiles[file] ?? current;
     const delta = current - prev;
 
-    const changes = this.isAICodeGenerating
-      ? this.lineChanges.ai
-      : this.lineChanges.human;
+    const changes = this.isAICodeGenerating ? this.lineChanges.ai : this.lineChanges.human;
     changes[file] = (changes[file] ?? 0) + delta;
 
     this.linesInFiles[file] = current;
@@ -267,7 +307,7 @@ export class Chronos {
 
   private recentlyAIPasted(time: number): boolean {
     this.AIrecentPastes = this.AIrecentPastes.filter(
-      (x) => x + Utils.secToMs(AI_RECENT_PASTES_TIME) >= time,
+      (x) => x + Utils.secToMs(AI_RECENT_PASTES_TIME) >= time
     );
     return this.AIrecentPastes.length > 3;
   }
@@ -374,33 +414,26 @@ export class Chronos {
         if (summary?.text) {
           if (this.showCodingActivity) {
             this.updateStatusBarText(summary.text.trim());
-            this.updateStatusBarTooltip(
-              "Chronos: Today’s coding time. Click to visit dashboard."
-            );
+            this.updateStatusBarTooltip('Chronos: Today’s coding time. Click to visit dashboard.');
           } else {
             this.updateStatusBarText();
             this.updateStatusBarTooltip(summary.text.trim());
           }
         } else {
           this.updateStatusBarText();
-          this.updateStatusBarTooltip(
-            "Chronos: Calculating time spent today in background..."
-          );
+          this.updateStatusBarTooltip('Chronos: Calculating time spent today in background...');
         }
       }
     } catch (err: any) {
-      this.logger.error(
-        `Error fetching today coding activity from API: ${err?.message || err}`
-      );
+      this.logger.error(`Error fetching today coding activity from API: ${err?.message || err}`);
       this.updateStatusBarText();
-      this.updateStatusBarTooltip(
-        "Chronos: Error fetching today’s coding time."
-      );
+      this.updateStatusBarTooltip('Chronos: Error fetching today’s coding time.');
     }
   }
 
   private updateStatusBarText(text?: string): void {
     if (!this.statusBar) return;
+
     if (!text) {
       this.statusBar.text = '$(clock)';
     } else {
@@ -411,5 +444,18 @@ export class Chronos {
   private updateStatusBarTooltip(tooltipText: string): void {
     if (!this.statusBar) return;
     this.statusBar.tooltip = tooltipText;
+  }
+
+  private setStatusBarVisibility(isVisible: boolean): void {
+    if (isVisible) {
+      this.statusBar?.show();
+      this.logger.debug('Status bar icon enabled.');
+    } else {
+      this.statusBar?.hide();
+      this.logger.debug('Status bar icon disabled.');
+    }
+  }
+
+  public async test() {
   }
 }

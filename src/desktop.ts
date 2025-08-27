@@ -1,6 +1,7 @@
+import * as child_process from 'child_process';
 import * as fs from 'fs';
 import * as os from 'os';
-import * as child_process from 'child_process';
+
 import type { StdioOptions } from 'child_process';
 
 export class Desktop {
