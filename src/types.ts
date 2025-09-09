@@ -28,6 +28,7 @@ export type Heartbeat = {
   alternate_project?: string;
   project_folder?: string;
   project_root_count?: number;
+  git_branch?: string;
   language?: string;
   category?: 'debugging' | 'ai coding' | 'building' | 'code reviewing';
   ai_line_changes?: number;
@@ -39,4 +40,4 @@ export type Setting = {
   key: string;
   value: string;
   error?: string;
-}
+};

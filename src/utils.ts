@@ -63,6 +63,15 @@ export class Utils {
     }
   }
 
+  public static getGitBranch(uri: vscode.Uri): string | undefined {
+    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+    if (!gitExtension) return;
+    const api = gitExtension.getAPI(1);
+
+    const repo = api.getRepository(uri);
+    return repo?.state.HEAD?.name;
+  }
+
   public static isAIChatSidebar(uri: vscode.Uri | undefined): boolean {
     if (!uri) return false;
     if (uri.fsPath.endsWith('.log')) return false;

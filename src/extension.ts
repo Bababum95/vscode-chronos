@@ -1,10 +1,10 @@
 import * as vscode from 'vscode';
 
 import { Chronos } from './chronos';
-import { Command, LogLevel } from './constants';
+import { Command, DEFAULT_LOG_LEVEL } from './constants';
 import { Logger } from './logger';
 
-const logger = new Logger(LogLevel.INFO);
+const logger = new Logger(DEFAULT_LOG_LEVEL);
 let chronos: Chronos;
 
 /** Entry point of the VS Code extension. */

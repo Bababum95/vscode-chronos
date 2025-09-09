@@ -10,13 +10,7 @@ import { Logger } from './logger';
 import { Options } from './options';
 import { Utils } from './utils';
 
-import type {
-  FileSelectionMap,
-  Heartbeat,
-  LineCounts,
-  Lines,
-  Setting,
-} from './types';
+import type { FileSelectionMap, Heartbeat, LineCounts, Lines, Setting } from './types';
 
 export class Chronos {
   private extension: any;
@@ -47,7 +41,7 @@ export class Chronos {
   private isAICodeGenerating: boolean = false;
   private hasAICapabilities: boolean = false;
   private lastAICodeGenerating: boolean = false;
-  private disabled: boolean = true;
+  private disabled: boolean = false;
   private lastDebug: boolean = false;
   private lastCompile: boolean = false;
   private isDebugging: boolean = false;
@@ -67,14 +61,14 @@ export class Chronos {
     this.extension = (extension !== undefined && extension.packageJSON) || { version: '0.0.0' };
     this.logger.debug(`Initializing Chronos v${this.extension.version}`);
 
-    this.api = new Api(await this.options.getServerUrl());
+    this.api = new Api(this.logger, await this.options.getServerUrl());
     const apiKey = await this.options.getApiKey();
     if (apiKey) this.api.setApiKey(apiKey);
 
     this.statusBar = vscode.window.createStatusBarItem(
       'com.chronos.statusbar',
       vscode.StatusBarAlignment.Left,
-      3,
+      3
     );
     this.statusBar.name = 'Chronos';
     this.statusBar.command = Command.DASHBOARD;
@@ -95,9 +89,9 @@ export class Chronos {
           (showCodingActivity: Setting) => {
             this.showCodingActivity = showCodingActivity.value !== 'false';
             this.getCodingActivity();
-          },
+          }
         );
-      },
+      }
     );
 
     this.setEventListeners();
@@ -209,6 +203,9 @@ export class Chronos {
 
     const folder = Utils.getProjectFolder(doc.uri);
     if (folder) heartbeat.project_folder = folder;
+
+    const branch = Utils.getGitBranch(doc.uri);
+    if (branch) heartbeat.git_branch = branch;
 
     if (doc.isUntitled) heartbeat.is_unsaved_entity = true;
 
@@ -410,14 +407,16 @@ export class Chronos {
     try {
       const summary = await this.api.getToday();
 
+      this.logger.debug(`Today coding activity: ${JSON.stringify(summary, null, 2)}`);
+
       if (summary) {
-        if (summary?.text) {
+        if (summary?.activeTime) {
           if (this.showCodingActivity) {
-            this.updateStatusBarText(summary.text.trim());
+            this.updateStatusBarText(summary.activeTime);
             this.updateStatusBarTooltip('Chronos: Today’s coding time. Click to visit dashboard.');
           } else {
             this.updateStatusBarText();
-            this.updateStatusBarTooltip(summary.text.trim());
+            this.updateStatusBarTooltip(summary.activeTime);
           }
         } else {
           this.updateStatusBarText();
@@ -456,6 +455,5 @@ export class Chronos {
     }
   }
 
-  public async test() {
-  }
+  public async test() {}
 }

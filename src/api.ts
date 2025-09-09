@@ -1,19 +1,23 @@
 import axios from 'axios';
 
+import { Logger } from './logger';
+
 import type { Heartbeat } from './types';
 
 export class Api {
   private apiKey: string | null = null;
   private apiUrl: string;
+  private logger: Logger;
 
-  constructor(serverUrl: string) {
+  constructor(logger: Logger, serverUrl: string) {
+    this.logger = logger;
     this.apiUrl = `${serverUrl}/api/v1`;
-    console.log(this.apiUrl);
+    this.logger.debug(`API URL: ${this.apiUrl}`);
   }
 
   setApiKey(apiKey: string) {
     this.apiKey = apiKey;
-    console.log(this.apiKey);
+    this.logger.debug(`API Key: ${this.apiKey}`);
   }
 
   hasApiKey(): boolean {
@@ -37,9 +41,20 @@ export class Api {
   }
 
   /** Fetch coding activity summary */
-  async getToday(): Promise<any> {
-    const today = new Date().toISOString().slice(0, 10);
-    const res = await axios.get(`${this.apiUrl}/summaries?start=${today}&end=${today}`, {
+  async getToday(untilNow: boolean = true): Promise<any> {
+    const now = new Date();
+    const startDate = new Date(now);
+    startDate.setHours(0, 0, 0, 0);
+    let endDate: Date;
+    if (untilNow) {
+      endDate = now;
+    } else {
+      endDate = new Date(now);
+      endDate.setHours(23, 59, 59, 999);
+    }
+    const start = Math.floor(startDate.getTime() / 1000);
+    const end = Math.floor(endDate.getTime() / 1000);
+    const res = await axios.get(`${this.apiUrl}/summaries?start=${start}&end=${end}`, {
       headers: {
         Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
       },
