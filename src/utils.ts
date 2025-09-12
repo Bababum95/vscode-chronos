@@ -95,14 +95,14 @@ export class Utils {
     return false;
   }
 
-  public static apiKeyInvalid(key?: string): string {
+  public static apiKeyInvalid(key?: string | null): string {
     const err = 'Invalid api key...';
     if (!key) return err;
-    // const re = new RegExp(
-    //   '^(waka_)?[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$',
-    //   'i',
-    // );
-    // if (!re.test(key)) return err;
+    const re = new RegExp(
+      '^(chronos_)?[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$',
+      'i'
+    );
+    if (!re.test(key)) return err;
     return '';
   }
 
@@ -121,7 +121,7 @@ export class Utils {
     const newCmds: string[] = [];
     let lastCmd = '';
     for (let i = 0; i < clone.length; i++) {
-      if (lastCmd == '--key') newCmds.push(this.wrapArg(this.obfuscateKey(clone[i])));
+      if (lastCmd === '--key') newCmds.push(this.wrapArg(this.obfuscateKey(clone[i])));
       else newCmds.push(this.wrapArg(clone[i]));
       lastCmd = clone[i];
     }

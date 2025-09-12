@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { Logger } from './logger';
+import { Utils } from './utils';
 
 import type { Heartbeat } from './types';
 
@@ -16,12 +17,19 @@ export class Api {
   }
 
   setApiKey(apiKey: string) {
+    // Validate API key before saving
+    const validationMsg = Utils.apiKeyInvalid(apiKey);
+    if (validationMsg) {
+      this.logger.error(validationMsg);
+      return;
+    }
+
     this.apiKey = apiKey;
     this.logger.debug(`API Key: ${this.apiKey}`);
   }
 
   hasApiKey(): boolean {
-    return !!this.apiKey;
+    return !Utils.apiKeyInvalid(this.apiKey);
   }
 
   /** Send a batch of heartbeats */
