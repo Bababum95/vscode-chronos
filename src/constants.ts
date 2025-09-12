@@ -12,7 +12,7 @@ export enum LogLevel {
   ERROR,
 }
 
-export const DEFAULT_SERVER_URL = 'http://localhost:3000';
+export const DEFAULT_SERVER_URL = 'https://next-chronos.vercel.app';
 export const DEFAULT_LOG_LEVEL = LogLevel.DEBUG;
 
 // All time in seconds
