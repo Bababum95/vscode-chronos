@@ -184,15 +184,11 @@ export class Options {
     return vscode.workspace.getConfiguration().get('chronos.apiKey') || '';
   }
 
-  public async getServerUrl(checkSettingsFile = false): Promise<string> {
+  public async getServerUrl(): Promise<string> {
     let serverUrl = this.getServerUrlFromEditor();
 
     if (!serverUrl) {
       serverUrl = this.getServerUrlFromEnv();
-    }
-
-    if (!serverUrl && !checkSettingsFile) {
-      return '';
     }
 
     if (!serverUrl) {

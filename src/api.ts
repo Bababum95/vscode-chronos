@@ -62,7 +62,7 @@ export class Api {
     }
     const start = Math.floor(startDate.getTime() / 1000);
     const end = Math.floor(endDate.getTime() / 1000);
-    const res = await axios.get(`${this.apiUrl}/summaries?start=${start}&end=${end}`, {
+    const res = await axios.get(`${this.apiUrl}/summaries/range?start=${start}&end=${end}`, {
       headers: {
         Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
       },
