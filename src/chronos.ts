@@ -410,13 +410,13 @@ export class Chronos {
       this.logger.debug(`Today coding activity: ${JSON.stringify(summary, null, 2)}`);
 
       if (summary) {
-        if (summary?.totalTimeStr) {
+        if (summary?.data?.totalTimeStr) {
           if (this.showCodingActivity) {
-            this.updateStatusBarText(summary.totalTimeStr);
+            this.updateStatusBarText(summary.data.totalTimeStr);
             this.updateStatusBarTooltip('Chronos: Today’s coding time. Click to visit dashboard.');
           } else {
             this.updateStatusBarText();
-            this.updateStatusBarTooltip(summary.totalTimeStr);
+            this.updateStatusBarTooltip(summary.data.totalTimeStr);
           }
         } else {
           this.updateStatusBarText();
