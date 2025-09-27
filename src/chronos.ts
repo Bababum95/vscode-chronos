@@ -8,9 +8,8 @@ import { AI_RECENT_PASTES_TIME, Command, SEND_BUFFER } from './constants';
 import { Desktop } from './desktop';
 import { Logger } from './logger';
 import { Options } from './options';
-import { Utils } from './utils';
-
 import type { FileSelectionMap, Heartbeat, LineCounts, Lines, Setting } from './types';
+import { Utils } from './utils';
 
 export class Chronos {
   private extension: any;
@@ -455,5 +454,18 @@ export class Chronos {
     }
   }
 
-  public async test() {}
+  public async test() {
+    const editor = vscode.window.activeTextEditor;
+    const doc = editor?.document;
+    if (!doc) {
+      this.logger.debug('No active document');
+      return;
+    }
+    const repo = Utils.getGitRepo(doc.uri);
+    if (!repo) {
+      this.logger.debug('No repository found');
+      return;
+    }
+    this.logger.debug(`Repository: ${JSON.stringify(repo, null, 2)}`);
+  }
 }

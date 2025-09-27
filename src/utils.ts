@@ -31,11 +31,7 @@ export class Utils {
   public static getProjectName(uri: vscode.Uri): string {
     if (!vscode.workspace) return '';
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-    if (workspaceFolder) {
-      try {
-        return workspaceFolder.name;
-      } catch (e) {}
-    }
+    if (workspaceFolder) return workspaceFolder.name;
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
       return vscode.workspace.workspaceFolders[0].name;
     }
@@ -45,11 +41,7 @@ export class Utils {
   public static getProjectFolder(uri: vscode.Uri): string {
     if (!vscode.workspace) return '';
     const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
-    if (workspaceFolder) {
-      try {
-        return workspaceFolder.uri.fsPath;
-      } catch (e) {}
-    }
+    if (workspaceFolder) return workspaceFolder.uri?.fsPath;
     if (vscode.workspace.workspaceFolders && vscode.workspace.workspaceFolders.length) {
       return vscode.workspace.workspaceFolders[0].uri.fsPath;
     }
@@ -70,6 +62,17 @@ export class Utils {
 
     const repo = api.getRepository(uri);
     return repo?.state.HEAD?.name;
+  }
+
+  public static getGitRepo(uri: vscode.Uri) {
+    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+    if (!gitExtension) return;
+
+    const api = gitExtension.getAPI(1);
+    const repo = api.getRepository(uri);
+    if (!repo) return;
+
+    return repo;
   }
 
   public static isAIChatSidebar(uri: vscode.Uri | undefined): boolean {

@@ -1,9 +1,8 @@
 import axios from 'axios';
 
 import { Logger } from './logger';
-import { Utils } from './utils';
-
 import type { Heartbeat } from './types';
+import { Utils } from './utils';
 
 export class Api {
   private apiKey: string | null = null;
