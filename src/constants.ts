@@ -1,8 +1,8 @@
 export enum Command {
-  HELLO = 'chronos.hello',
   SET_API_KEY = 'chronos.setApiKey',
-  TEST = 'chronos.test',
   DASHBOARD = 'chronos.dashboard',
+  SET_URI = 'chronos.setUri',
+  OPEN_LOGS = 'chronos.openLogs',
 }
 
 export enum LogLevel {
@@ -13,6 +13,7 @@ export enum LogLevel {
 }
 
 export const DEFAULT_SERVER_URL = 'https://next-chronos.vercel.app';
+export const DASHBOARD_URL = 'https://next-chronos.vercel.app/dashboard';
 export const DEFAULT_LOG_LEVEL = LogLevel.DEBUG;
 
 // All time in seconds

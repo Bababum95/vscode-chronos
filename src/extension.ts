@@ -7,25 +7,30 @@ import { Logger } from './logger';
 const logger = new Logger(DEFAULT_LOG_LEVEL);
 let chronos: Chronos;
 
-/** Entry point of the VS Code extension. */
 export function activate(context: vscode.ExtensionContext) {
   chronos = new Chronos(context.extensionPath, logger);
 
   context.subscriptions.push(
-    vscode.commands.registerCommand(Command.HELLO, () => {
-      vscode.window.showInformationMessage('Chronos is alive!');
-    })
-  );
-
-  context.subscriptions.push(
-    vscode.commands.registerCommand(Command.TEST, () => {
-      chronos.test();
-    })
-  );
-
-  context.subscriptions.push(
     vscode.commands.registerCommand(Command.SET_API_KEY, () => {
       chronos.promptForApiKey();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(Command.DASHBOARD, () => {
+      chronos.dashboard();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(Command.SET_URI, () => {
+      chronos.promptForServerUrl();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(Command.OPEN_LOGS, () => {
+      chronos.openLogs();
     })
   );
 

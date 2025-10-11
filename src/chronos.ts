@@ -4,12 +4,12 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 
 import { Api } from './api';
-import { AI_RECENT_PASTES_TIME, Command, SEND_BUFFER } from './constants';
+import { AI_RECENT_PASTES_TIME, Command, DASHBOARD_URL, SEND_BUFFER } from './constants';
 import { Desktop } from './desktop';
 import { Logger } from './logger';
 import { Options } from './options';
-import type { FileSelectionMap, Heartbeat, LineCounts, Lines, Setting } from './types';
 import { Utils } from './utils';
+import type { FileSelectionMap, Heartbeat, LineCounts, Lines, Setting } from './types';
 
 export class Chronos {
   private extension: any;
@@ -107,7 +107,7 @@ export class Chronos {
     try {
       fs.mkdirSync(folder, { recursive: true });
       this.resourcesLocation = folder;
-    } catch (e) {
+    } catch {
       this.resourcesLocation = this.extensionPath;
     }
   }
@@ -374,6 +374,46 @@ export class Chronos {
     });
   }
 
+  public async promptForServerUrl(): Promise<void> {
+    const defaultVal = await this.options.getServerUrl();
+    const promptOptions = {
+      prompt: 'Server URL',
+      placeHolder: 'Enter server URL (e.g., https://your-domain.com)',
+      value: defaultVal,
+      ignoreFocusOut: true,
+      validateInput: (val: string) => {
+        if (!val || val.trim().length === 0) {
+          return 'Server URL cannot be empty';
+        }
+        try {
+          new URL(val);
+          return null;
+        } catch {
+          return 'Invalid URL format';
+        }
+      },
+    };
+    vscode.window.showInputBox(promptOptions).then((val) => {
+      if (val !== undefined) {
+        const trimmedVal = val.trim();
+        if (trimmedVal) {
+          // Remove trailing slash if present
+          const serverUrl = trimmedVal.endsWith('/') ? trimmedVal.slice(0, -1) : trimmedVal;
+          this.options.setSetting('settings', 'server_url', serverUrl, false);
+          this.api.setServerUrl(serverUrl);
+          vscode.workspace
+            .getConfiguration('chronos')
+            .update('serverUrl', serverUrl, vscode.ConfigurationTarget.Global);
+          vscode.window.showInformationMessage(`Server URL updated to: ${serverUrl}`);
+        } else {
+          vscode.window.setStatusBarMessage('Server URL not provided');
+        }
+      } else {
+        vscode.window.setStatusBarMessage('Server URL not provided');
+      }
+    });
+  }
+
   private isDuplicateHeartbeat(file: string, time: number, selection: vscode.Position): boolean {
     let duplicate = false;
     const minutes = 30;
@@ -451,6 +491,25 @@ export class Chronos {
     } else {
       this.statusBar?.hide();
       this.logger.debug('Status bar icon disabled.');
+    }
+  }
+
+  public async dashboard() {
+    const url = vscode.Uri.parse(DASHBOARD_URL);
+    await vscode.env.openExternal(url);
+  }
+
+  public async openLogs() {
+    const logFile = this.options.getLogFile();
+    try {
+      const uri = vscode.Uri.file(logFile);
+      const document = await vscode.workspace.openTextDocument(uri);
+      await vscode.window.showTextDocument(document, { preview: false });
+      this.logger.debug(`Opened log file: ${logFile}`);
+    } catch (err: any) {
+      const message = `Failed to open log file: ${err?.message || err}`;
+      this.logger.error(message);
+      vscode.window.showErrorMessage(message);
     }
   }
 

@@ -8,10 +8,11 @@ export class Api {
   private apiKey: string | null = null;
   private apiUrl: string;
   private logger: Logger;
+  private prefix: string = 'api/v1';
 
   constructor(logger: Logger, serverUrl: string) {
     this.logger = logger;
-    this.apiUrl = `${serverUrl}/api/v1`;
+    this.apiUrl = `${serverUrl}/${this.prefix}`;
     this.logger.debug(`API URL: ${this.apiUrl}`);
   }
 
@@ -25,6 +26,11 @@ export class Api {
 
     this.apiKey = apiKey;
     this.logger.debug(`API Key: ${this.apiKey}`);
+  }
+
+  setServerUrl(serverUrl: string) {
+    this.apiUrl = `${serverUrl}/${this.prefix}`;
+    this.logger.debug(`API URL updated to: ${this.apiUrl}`);
   }
 
   hasApiKey(): boolean {

@@ -2,7 +2,7 @@
   "name": "vscode-chronos",
   "displayName": "Chronos",
   "description": "Track coding time and tasks inside VS Code",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "bababum",
   "icon": "images/logo.png",
   "author": {
@@ -33,16 +33,16 @@
   "contributes": {
     "commands": [
       {
-        "command": "chronos.hello",
-        "title": "Chronos: Hello"
-      },
-      {
         "command": "chronos.setApiKey",
         "title": "Chronos: Api Key"
       },
       {
-        "command": "chronos.test",
-        "title": "Chronos: Test"
+        "command": "chronos.setUri",
+        "title": "Chronos: Set Server URL"
+      },
+      {
+        "command": "chronos.openLogs",
+        "title": "Chronos: Open Log File"
       }
     ],
     "configuration": {

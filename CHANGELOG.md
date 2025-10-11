@@ -8,6 +8,41 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 - Future enhancements and bug fixes
 
+## [1.0.2] - 2025-10-11
+
+### Added
+
+- **Set Server URL Command**: New command `Chronos: Set Server URL` to easily change the API server URL through a dialog with URL validation
+  - Validates URL format before saving
+  - Automatically removes trailing slashes
+  - Updates both configuration file and active API client
+  - Provides user feedback on successful update
+- **Open Log File Command**: New command `Chronos: Open Log File` to open the extension's log file directly in VS Code
+  - Opens log file in a non-preview tab for easy access
+  - Displays error message if log file cannot be accessed
+  - Useful for debugging and troubleshooting
+- **Dashboard Command**: New command `Chronos: Dashboard` to quickly open the Chronos dashboard in the default browser
+
+### Changed
+
+- **API Class Enhancement**: Added `setServerUrl()` method to allow dynamic server URL updates without restart
+- **Command Structure**: Reorganized command palette entries for better user experience
+  - Moved away from test/debug commands to production-ready user commands
+  - All commands now have clear, user-friendly titles
+
+### Removed
+
+- **Test Commands**: Removed development-only commands (`Chronos: Hello` and `Chronos: Test`) from production build
+  - These were debug commands and not needed for end users
+  - Reduced command palette clutter
+
+### Technical Improvements
+
+- Improved error handling in log file opening
+- Better URL validation with native URL API
+- Enhanced user feedback messages for all new commands
+- Code cleanup and removal of unused command registrations
+
 ## [1.0.1] - 2025-09-22
 
 ### Changed
