@@ -12,10 +12,6 @@ Chronos is a VS Code extension that tracks your coding time and tasks.
 
 - `Chronos: Api Key` — set your API key.
 
-## Requirements
-
-- Chronos server (https://next-chronos.vercel.app)
-
 ## License
 
 MIT
