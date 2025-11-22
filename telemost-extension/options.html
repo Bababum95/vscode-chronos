@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telemost CRM Helper – Options</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        margin: 24px;
+        color: #222;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 420px;
+      }
+
+      label {
+        font-weight: 600;
+      }
+
+      input[type='password'] {
+        padding: 8px;
+        font-size: 1rem;
+      }
+
+      button {
+        width: fit-content;
+        padding: 8px 16px;
+        font-size: 1rem;
+        cursor: pointer;
+      }
+
+      .status {
+        font-size: 0.9rem;
+        color: #0a6e2d;
+        min-height: 1.2em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Telemost CRM Helper</h1>
+    <p>Save your CRM API key below. The key is stored using <code>chrome.storage</code>.</p>
+
+    <form id="api-key-form">
+      <label for="crm-api-key">CRM API Key</label>
+      <input id="crm-api-key" type="password" name="crmApiKey" autocomplete="off" required />
+      <div>
+        <button type="submit">Save</button>
+        <button type="button" id="log-key-button">Log stored key</button>
+      </div>
+      <span class="status" id="status"></span>
+    </form>
+
+    <script src="options.js" type="module"></script>
+  </body>
+</html>
