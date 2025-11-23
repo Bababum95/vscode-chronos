@@ -262,7 +262,9 @@ export class Options {
       }
 
       fs.writeFile(configFile as string, contents.join('\n'), (err) => {
-        if (err) throw err;
+        if (err) {
+          this.logger.error(`Failed to write config file ${configFile}: ${err.message}`);
+        }
       });
     });
   }

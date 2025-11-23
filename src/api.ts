@@ -41,37 +41,51 @@ export class Api {
   async sendHeartbeats(heartbeats: Heartbeat[]): Promise<void> {
     if (!heartbeats.length) return;
 
-    await axios.post(
-      `${this.apiUrl}/heartbeats`,
-      { heartbeats },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
-        },
-      }
-    );
+    try {
+      await axios.post(
+        `${this.apiUrl}/heartbeats`,
+        { heartbeats },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
+          },
+        }
+      );
+    } catch (err: any) {
+      // Пробрасываем ошибку дальше для обработки в вызывающем коде
+      const errorMessage = err?.response?.data?.message || err?.message || 'Unknown error';
+      this.logger.error(`Failed to send heartbeats: ${errorMessage}`);
+      throw err;
+    }
   }
 
   /** Fetch coding activity summary */
   async getToday(untilNow: boolean = true): Promise<any> {
-    const now = new Date();
-    const startDate = new Date(now);
-    startDate.setHours(0, 0, 0, 0);
-    let endDate: Date;
-    if (untilNow) {
-      endDate = now;
-    } else {
-      endDate = new Date(now);
-      endDate.setHours(23, 59, 59, 999);
+    try {
+      const now = new Date();
+      const startDate = new Date(now);
+      startDate.setHours(0, 0, 0, 0);
+      let endDate: Date;
+      if (untilNow) {
+        endDate = now;
+      } else {
+        endDate = new Date(now);
+        endDate.setHours(23, 59, 59, 999);
+      }
+      const start = Math.floor(startDate.getTime() / 1000);
+      const end = Math.floor(endDate.getTime() / 1000);
+      const res = await axios.get(`${this.apiUrl}/summaries/range?start=${start}&end=${end}`, {
+        headers: {
+          Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
+        },
+      });
+      return res.data;
+    } catch (err: any) {
+      // Пробрасываем ошибку дальше для обработки в вызывающем коде
+      const errorMessage = err?.response?.data?.message || err?.message || 'Unknown error';
+      this.logger.error(`Failed to fetch today's coding activity: ${errorMessage}`);
+      throw err;
     }
-    const start = Math.floor(startDate.getTime() / 1000);
-    const end = Math.floor(endDate.getTime() / 1000);
-    const res = await axios.get(`${this.apiUrl}/summaries/range?start=${start}&end=${end}`, {
-      headers: {
-        Authorization: `Basic ${Buffer.from(`${this.apiKey}:`).toString('base64')}`,
-      },
-    });
-    return res.data;
   }
 }

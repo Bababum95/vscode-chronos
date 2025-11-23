@@ -35,10 +35,14 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(chronos);
-  chronos.initialize();
+  chronos.initialize().catch((err: any) => {
+    logger.error(`Failed to initialize Chronos: ${err?.message || err}`);
+  });
 }
 
 /** Called when the extension is deactivated. */
 export function deactivate() {
-  chronos.dispose();
+  if (chronos) {
+    chronos.dispose();
+  }
 }

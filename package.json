@@ -2,7 +2,7 @@
   "name": "vscode-chronos",
   "displayName": "Chronos",
   "description": "Track coding time and tasks inside VS Code",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "bababum",
   "icon": "images/logo.png",
   "author": {

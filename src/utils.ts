@@ -56,23 +56,36 @@ export class Utils {
   }
 
   public static getGitBranch(uri: vscode.Uri): string | undefined {
-    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-    if (!gitExtension) return;
-    const api = gitExtension.getAPI(1);
+    try {
+      const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+      if (!gitExtension) return;
+      const api = gitExtension.getAPI(1);
+      if (!api) return;
 
-    const repo = api.getRepository(uri);
-    return repo?.state.HEAD?.name;
+      const repo = api.getRepository(uri);
+      return repo?.state.HEAD?.name;
+    } catch (err) {
+      // Игнорируем ошибки при получении git branch
+      return undefined;
+    }
   }
 
   public static getGitRepo(uri: vscode.Uri) {
-    const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
-    if (!gitExtension) return;
+    try {
+      const gitExtension = vscode.extensions.getExtension('vscode.git')?.exports;
+      if (!gitExtension) return;
 
-    const api = gitExtension.getAPI(1);
-    const repo = api.getRepository(uri);
-    if (!repo) return;
+      const api = gitExtension.getAPI(1);
+      if (!api) return;
 
-    return repo;
+      const repo = api.getRepository(uri);
+      if (!repo) return;
+
+      return repo;
+    } catch (err) {
+      // Игнорируем ошибки при получении git repo
+      return undefined;
+    }
   }
 
   public static isAIChatSidebar(uri: vscode.Uri | undefined): boolean {

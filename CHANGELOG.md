@@ -4,9 +4,42 @@ All notable changes to the "vscode-chronos" extension will be documented in this
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## [1.0.3] - 2025-11-23
 
-- Future enhancements and bug fixes
+### Fixed
+
+- **Extension ID Mismatch**: Fixed incorrect extension ID used in `vscode.extensions.getExtension()` call
+  - Changed from `'Chronos.vscode-chronos'` to `'bababum.vscode-chronos'` to match actual publisher.name from package.json
+  - Prevents potential errors when extension tries to access its own metadata
+- **Unhandled Promise Rejections**: Added comprehensive error handling for all async operations
+  - Added `.catch()` handlers for `sendHeartbeats()` calls without await
+  - Added error handling for `getCodingActivity()` async callbacks
+  - Added try-catch block in `initialize()` method to prevent extension activation failures
+  - Added error handling for async `initialize()` call in extension activation
+- **Deactivate Function Safety**: Added null check in `deactivate()` function to prevent errors when extension is not properly initialized
+- **API Error Handling**: Improved error handling in API class methods
+  - Added try-catch blocks in `sendHeartbeats()` and `getToday()` methods
+  - Added detailed error logging with response message extraction
+  - Errors are now properly logged and re-thrown for upstream handling
+- **File System Error Handling**: Fixed unhandled exception in `fs.writeFile` callback
+  - Replaced `throw err` with proper error logging using Logger instance
+  - Prevents extension crashes when config file cannot be written
+- **Git Extension Safety**: Added error handling for Git extension API access
+  - Wrapped `getGitBranch()` and `getGitRepo()` methods in try-catch blocks
+  - Prevents errors when Git extension is not available or not initialized
+  - Methods now gracefully return `undefined` on errors instead of crashing
+- **Disposable Property**: Changed `disposable` property to optional type (`disposable?: vscode.Disposable`)
+  - Prevents TypeScript errors when disposable is not yet initialized
+  - Better aligns with actual usage patterns in the code
+
+### Technical Improvements
+
+- **Error Recovery**: All critical async operations now have proper error handling
+  - Extension continues to function even if individual operations fail
+  - All errors are logged for debugging purposes
+  - User experience is not interrupted by background operation failures
+- **Type Safety**: Improved type definitions for optional properties
+- **Error Logging**: Enhanced error messages with context and stack traces where applicable
 
 ## [1.0.2] - 2025-10-11
 

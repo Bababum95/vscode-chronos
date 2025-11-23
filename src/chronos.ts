@@ -13,7 +13,7 @@ import type { FileSelectionMap, Heartbeat, LineCounts, Lines, Setting } from './
 
 export class Chronos {
   private extension: any;
-  private disposable: vscode.Disposable;
+  private disposable?: vscode.Disposable;
   private statusBar?: vscode.StatusBarItem = undefined;
 
   private logger: Logger;
@@ -56,44 +56,52 @@ export class Chronos {
   }
 
   public async initialize() {
-    const extension = vscode.extensions.getExtension('Chronos.vscode-chronos');
-    this.extension = (extension !== undefined && extension.packageJSON) || { version: '0.0.0' };
-    this.logger.debug(`Initializing Chronos v${this.extension.version}`);
+    try {
+      // Используем правильный ID расширения: publisher.name из package.json
+      const extension = vscode.extensions.getExtension('bababum.vscode-chronos');
+      this.extension = (extension !== undefined && extension.packageJSON) || { version: '0.0.0' };
+      this.logger.debug(`Initializing Chronos v${this.extension.version}`);
 
-    this.api = new Api(this.logger, await this.options.getServerUrl());
-    const apiKey = await this.options.getApiKey();
-    if (apiKey) this.api.setApiKey(apiKey);
+      this.api = new Api(this.logger, await this.options.getServerUrl());
+      const apiKey = await this.options.getApiKey();
+      if (apiKey) this.api.setApiKey(apiKey);
 
-    this.statusBar = vscode.window.createStatusBarItem(
-      'com.chronos.statusbar',
-      vscode.StatusBarAlignment.Left,
-      3
-    );
-    this.statusBar.name = 'Chronos';
-    this.statusBar.command = Command.DASHBOARD;
+      this.statusBar = vscode.window.createStatusBarItem(
+        'com.chronos.statusbar',
+        vscode.StatusBarAlignment.Left,
+        3
+      );
+      this.statusBar.name = 'Chronos';
+      this.statusBar.command = Command.DASHBOARD;
 
-    this.options.getSetting(
-      'settings',
-      'status_bar_enabled',
-      false,
-      (statusBarEnabled: Setting) => {
-        this.showStatusBar = statusBarEnabled.value !== 'false';
-        this.setStatusBarVisibility(this.showStatusBar);
-        this.updateStatusBarText('Chronos Initializing...');
+      this.options.getSetting(
+        'settings',
+        'status_bar_enabled',
+        false,
+        (statusBarEnabled: Setting) => {
+          this.showStatusBar = statusBarEnabled.value !== 'false';
+          this.setStatusBarVisibility(this.showStatusBar);
+          this.updateStatusBarText('Chronos Initializing...');
 
-        this.options.getSetting(
-          'settings',
-          'status_bar_coding_activity',
-          false,
-          (showCodingActivity: Setting) => {
-            this.showCodingActivity = showCodingActivity.value !== 'false';
-            this.getCodingActivity();
-          }
-        );
-      }
-    );
+          this.options.getSetting(
+            'settings',
+            'status_bar_coding_activity',
+            false,
+            (showCodingActivity: Setting) => {
+              this.showCodingActivity = showCodingActivity.value !== 'false';
+              this.getCodingActivity().catch((err: any) => {
+                this.logger.error(`Error in getCodingActivity: ${err?.message || err}`);
+              });
+            }
+          );
+        }
+      );
 
-    this.setEventListeners();
+      this.setEventListeners();
+    } catch (err: any) {
+      this.logger.error(`Error initializing Chronos: ${err?.message || err}`);
+      // Не прерываем работу, просто логируем ошибку
+    }
   }
 
   public dispose() {
@@ -114,7 +122,9 @@ export class Chronos {
 
   private onEvent(isWrite: boolean): void {
     if (Date.now() - this.lastSent > Utils.secToMs(SEND_BUFFER)) {
-      this.sendHeartbeats();
+      this.sendHeartbeats().catch((err: any) => {
+        this.logger.error(`Error in sendHeartbeats from onEvent: ${err?.message || err}`);
+      });
     }
 
     clearTimeout(this.debounceId);
@@ -212,7 +222,9 @@ export class Chronos {
     this.heartbeats.push(heartbeat);
 
     if (now - this.lastSent > Utils.secToMs(SEND_BUFFER)) {
-      await this.sendHeartbeats();
+      this.sendHeartbeats().catch((err: any) => {
+        this.logger.error(`Error in sendHeartbeats from appendHeartbeat: ${err?.message || err}`);
+      });
     }
   }
 
