@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telemost CRM Helper</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 16px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        min-width: 260px;
+      }
+
+      button {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+        padding: 8px 12px;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+
+      .status {
+        font-size: 0.85rem;
+        min-height: 1.1em;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="open-options">Open options</button>
+    <button id="log-key">Log stored API key</button>
+    <div class="status" id="status"></div>
+    <script src="popup.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "Telemost CRM Helper",
+  "description": "Stores a CRM API key and provides Telemost detection utilities.",
+  "version": "1.0.0",
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://telemost.yandex.ru/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  ],
+  "action": {
+    "default_title": "Telemost CRM Helper",
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": ["https://telemost.yandex.ru/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
